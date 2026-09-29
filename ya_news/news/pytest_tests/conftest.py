@@ -51,7 +51,7 @@ def comment(news, author, db):
 
 @pytest.fixture
 def news_list(db):
-    today = datetime.today()
+    today = datetime.today().date()
     return News.objects.bulk_create(
         [
             News(
@@ -74,6 +74,7 @@ def comments(news, author, db):
             text=f'Комментарий {index}',
         )
         comment.created = now - timedelta(days=index)
+        comment.save()
 
 
 @pytest.fixture

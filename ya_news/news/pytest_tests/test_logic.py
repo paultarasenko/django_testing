@@ -11,13 +11,12 @@ def test_anonymous_cannot_create_comment(
     client,
     detail_url,
 ):
-    comments_before = set(Comment.objects.values_list('pk', flat=True))
+    comments_count = Comment.objects.count()
 
     response = client.post(detail_url, data=FORM_DATA)
 
-    comments_after = set(Comment.objects.values_list('pk', flat=True))
     assert response.status_code == HTTPStatus.FOUND
-    assert comments_after == comments_before
+    assert Comment.objects.count() == comments_count
 
 
 def test_author_can_create_comment(
@@ -26,14 +25,13 @@ def test_author_can_create_comment(
     news,
     detail_url,
 ):
-    existing_ids = set(Comment.objects.values_list('pk', flat=True))
+    comments_count = Comment.objects.count()
 
     response = author_client.post(detail_url, data=FORM_DATA)
 
-    created = Comment.objects.exclude(pk__in=existing_ids)
     assert response.url == f'{detail_url}#comments'
-    assert created.count() == 1
-    new_comment = created.get()
+    assert Comment.objects.count() == comments_count + 1
+    new_comment = Comment.objects.get()
     assert new_comment.text == FORM_DATA['text']
     assert new_comment.author == author
     assert new_comment.news == news

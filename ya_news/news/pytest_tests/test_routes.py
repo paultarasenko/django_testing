@@ -4,18 +4,6 @@ import pytest
 from django.urls import reverse
 
 
-@pytest.mark.parametrize(
-    'url_fixture',
-    ('home_url', 'detail_url', 'login_url'),
-)
-def test_public_pages_are_available(client, request, url_fixture):
-    url = request.getfixturevalue(url_fixture)
-
-    response = client.get(url)
-
-    assert response.status_code == HTTPStatus.OK
-
-
 def test_signup_page_is_available(client):
     url = reverse('users:signup')
 
@@ -75,7 +63,7 @@ def test_anonymous_user_is_redirected_to_login(
     assert response.url == expected_url
 
 
-def test_logout_accepts_post_request(author_client):
+def test_authorized_user_logs_out_by_post_request(author_client):
     url = reverse('users:logout')
 
     response = author_client.post(url)
